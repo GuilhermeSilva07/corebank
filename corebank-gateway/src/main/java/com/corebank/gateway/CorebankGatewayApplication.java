@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CorebankGatewayApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CorebankGatewayApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(CorebankGatewayApplication.class, args);
+  }
 }
