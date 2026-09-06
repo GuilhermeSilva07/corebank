@@ -11,9 +11,6 @@
 	<artifactId>corebank-gateway</artifactId>
 	<name>corebank-gateway</name>
 	<description>REST API, security and DTOs for Core Bank</description>
-	<properties>
-		<java.version>21</java.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
