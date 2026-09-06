@@ -3,11 +3,11 @@ services:
     image: postgres:16
     container_name: corebank-postgres
     environment:
-      POSTGRES_DB: corebank
-      POSTGRES_USER: corebank
-      POSTGRES_PASSWORD: corebank
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - corebank-postgres-data:/var/lib/postgresql/data
 

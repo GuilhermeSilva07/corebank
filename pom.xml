@@ -19,8 +19,14 @@
   <name>Core Bank Parent</name>
   <description>Parent build for the Core Bank learning project</description>
 
+  <properties>
+    <java.version>21</java.version>
+  </properties>
+
   <modules>
     <module>corebank-gateway</module>
+    <module>corebank-domain</module>
+    <module>corebank-scheduler</module>
   </modules>
 
 </project>
