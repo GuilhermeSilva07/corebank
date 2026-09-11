@@ -1,4 +1,4 @@
-package com.corebank.domain;
+package com.corebank.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
