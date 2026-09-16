@@ -13,20 +13,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
 
-    public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Email ou senha inválidos."));
+  public LoginResponse login(LoginRequest request) {
+    User user =
+        userRepository
+            .findByEmail(request.getEmail())
+            .orElseThrow(() -> new BadCredentialsException("Email ou senha inválidos."));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new BadCredentialsException("Email ou senha inválidos.");
-        }
-
-        String accessToken = jwtService.generateAccessToken(user.getId());
-
-        return new LoginResponse(accessToken, "placeholder-refresh-token");
+    if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+      throw new BadCredentialsException("Email ou senha inválidos.");
     }
+
+    String accessToken = jwtService.generateAccessToken(user.getId());
+
+    return new LoginResponse(accessToken, "placeholder-refresh-token");
+  }
 }

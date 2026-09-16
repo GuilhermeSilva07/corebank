@@ -27,25 +27,25 @@ public class AuthController {
 
   @PostMapping("/users")
   public ResponseEntity<RegisterUserResponse> register(
-          @RequestBody @Valid RegisterUserRequest request) {
+      @RequestBody @Valid RegisterUserRequest request) {
 
     String hashedPassword = passwordEncoder.encode(request.getPassword());
 
     RegisterUserCommand command =
-            new RegisterUserCommand(
-                    request.getFullName(),
-                    request.getCpf(),
-                    request.getEmail(),
-                    request.getPhone(),
-                    hashedPassword,
-                    request.getBirthDate(),
-                    request.getAddress().getStreet(),
-                    request.getAddress().getNumber(),
-                    request.getAddress().getComplement(),
-                    request.getAddress().getNeighborhood(),
-                    request.getAddress().getCity(),
-                    request.getAddress().getState(),
-                    request.getAddress().getZipCode());
+        new RegisterUserCommand(
+            request.getFullName(),
+            request.getCpf(),
+            request.getEmail(),
+            request.getPhone(),
+            hashedPassword,
+            request.getBirthDate(),
+            request.getAddress().getStreet(),
+            request.getAddress().getNumber(),
+            request.getAddress().getComplement(),
+            request.getAddress().getNeighborhood(),
+            request.getAddress().getCity(),
+            request.getAddress().getState(),
+            request.getAddress().getZipCode());
 
     Account account = userRegistrationService.register(command);
 
