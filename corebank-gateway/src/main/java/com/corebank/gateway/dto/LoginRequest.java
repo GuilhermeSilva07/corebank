@@ -3,36 +3,20 @@ package com.corebank.gateway.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginRequest {
 
-  @NotBlank(message = "O email é obrigatório")
-  @Email(message = "Formato de email inválido")
+  @NotBlank(message = "The email is required")
+  @Email(message = "Invalid email format")
   private String email;
 
-  @NotBlank(message = "A senha é obrigatória")
+  @NotBlank(message = "The password is required")
   private String password;
 }
-
-/*
-Versão de DTO como record comentada, para discussão sobre qual modelo usar
-
- package com.corebank.gateway.dto;
-
- import jakarta.validation.constraints.Email;
- import jakarta.validation.constraints.NotBlank;
-
- public record LoginRequest(
-     @NotBlank(message = "O email é obrigatório")
-     @Email(message = "Formato de email inválido")
-     String email,
-
-     @NotBlank(message = "A senha é obrigatória")
-     String password
- ) {}
-*/

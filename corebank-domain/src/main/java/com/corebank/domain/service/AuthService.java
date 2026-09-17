@@ -1,9 +1,8 @@
-package com.corebank.gateway.service;
+package com.corebank.domain.service; // Pacote atualizado
 
+import com.corebank.domain.command.LoginCommand;
 import com.corebank.domain.entity.User;
 import com.corebank.domain.repository.UserRepository;
-import com.corebank.gateway.dto.LoginRequest;
-import com.corebank.gateway.dto.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,18 +16,16 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
 
-  public LoginResponse login(LoginRequest request) {
+  public String login(LoginCommand command) {
     User user =
         userRepository
-            .findByEmail(request.getEmail())
+            .findByEmail(command.email())
             .orElseThrow(() -> new BadCredentialsException("Email ou senha inválidos."));
 
-    if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+    if (!passwordEncoder.matches(command.password(), user.getPasswordHash())) {
       throw new BadCredentialsException("Email ou senha inválidos.");
     }
 
-    String accessToken = jwtService.generateAccessToken(user.getId());
-
-    return new LoginResponse(accessToken, "placeholder-refresh-token");
+    return jwtService.generateAccessToken(user.getId());
   }
 }

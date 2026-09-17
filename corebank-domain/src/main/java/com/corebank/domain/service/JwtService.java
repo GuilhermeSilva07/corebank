@@ -1,4 +1,4 @@
-package com.corebank.gateway.service;
+package com.corebank.domain.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,7 +15,7 @@ public class JwtService {
   @Value("${jwt.secret}")
   private String secretKey;
 
-  private final long EXPIRATION_TIME_MS = 900000;
+  private static final long EXPIRATION_TIME_MS = 900000;
 
   public String generateAccessToken(UUID userId) {
     Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
