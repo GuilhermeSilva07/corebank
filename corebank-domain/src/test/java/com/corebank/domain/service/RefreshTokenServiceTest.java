@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceTest {
@@ -63,8 +64,30 @@ class RefreshTokenServiceTest {
     assertThat(result.refreshToken()).isNotBlank();
     assertThat(storedToken.getRevokedAt()).isNotNull();
 
-    verify(refreshTokenRepository, times(1)).save(storedToken);
-    verify(refreshTokenRepository, times(2)).save(any(RefreshToken.class));
+    verify(refreshTokenRepository, times(1)).saveAndFlush(storedToken);
+    verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
+  }
+
+  @Test
+  void
+      rotate_concurrentRotationDetected_throwsInvalidRefreshTokenExceptionAndDoesNotIssueNewToken() {
+    User user = new User();
+    user.setId(UUID.randomUUID());
+
+    RefreshToken storedToken = new RefreshToken();
+    storedToken.setUser(user);
+    storedToken.setTokenHash("any-hash");
+    storedToken.setExpiresAt(Instant.now().plus(1, ChronoUnit.DAYS));
+
+    when(refreshTokenRepository.findByTokenHashAndRevokedAtIsNull(any()))
+        .thenReturn(Optional.of(storedToken));
+    when(refreshTokenRepository.saveAndFlush(storedToken))
+        .thenThrow(new OptimisticLockingFailureException("stale version"));
+
+    assertThatThrownBy(() -> refreshTokenService.rotate("raw-refresh-token"))
+        .isInstanceOf(InvalidRefreshTokenException.class);
+
+    verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
   }
 
   @Test
