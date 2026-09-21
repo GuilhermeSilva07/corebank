@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -39,4 +40,8 @@ public class RefreshToken {
 
   @Column(name = "revoked_at")
   private Instant revokedAt;
+
+  @Version
+  @Column(name = "version", nullable = false)
+  private Long version;
 }

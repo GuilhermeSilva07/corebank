@@ -9,7 +9,9 @@ import com.corebank.domain.util.TokenUtils;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class RefreshTokenService {
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtService jwtService;
 
+  @Transactional
   public String generateAndStore(User user) {
     String rawToken = TokenUtils.generateRandomToken();
     String tokenHash = TokenUtils.hash(rawToken);
@@ -35,6 +38,7 @@ public class RefreshTokenService {
     return rawToken;
   }
 
+  @Transactional
   public RefreshResult rotate(String rawToken) {
     String tokenHash = TokenUtils.hash(rawToken);
 
@@ -48,11 +52,19 @@ public class RefreshTokenService {
     }
 
     refreshToken.setRevokedAt(Instant.now());
-    refreshTokenRepository.save(refreshToken);
+    revokeWithOptimisticLock(refreshToken);
 
     String newRefreshToken = generateAndStore(refreshToken.getUser());
     String newAccessToken = jwtService.generateAccessToken(refreshToken.getUser().getId());
 
     return new RefreshResult(newAccessToken, newRefreshToken);
+  }
+
+  private void revokeWithOptimisticLock(RefreshToken refreshToken) {
+    try {
+      refreshTokenRepository.saveAndFlush(refreshToken);
+    } catch (OptimisticLockingFailureException e) {
+      throw new InvalidRefreshTokenException("Refresh token já foi utilizado.");
+    }
   }
 }
