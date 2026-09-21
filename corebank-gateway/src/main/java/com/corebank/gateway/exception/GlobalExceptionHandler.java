@@ -1,5 +1,6 @@
 package com.corebank.gateway.exception;
 
+import com.corebank.domain.exception.InvalidRefreshTokenException;
 import com.corebank.gateway.dto.error.ApiFieldError;
 import com.corebank.gateway.dto.error.ErrorResponse;
 import java.util.List;
@@ -33,6 +34,12 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
     ErrorResponse errorResponse = new ErrorResponse("Unauthorized", "INVALID_CREDENTIALS", null);
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+  }
+
+  @ExceptionHandler(InvalidRefreshTokenException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
+    ErrorResponse errorResponse = new ErrorResponse("Unauthorized", "INVALID_REFRESH_TOKEN", null);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
   }
 }
