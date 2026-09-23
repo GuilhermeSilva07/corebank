@@ -22,10 +22,10 @@ public class AuthService {
     User user =
         userRepository
             .findByEmail(command.email())
-            .orElseThrow(() -> new BadCredentialsException("Email ou senha inválidos."));
+            .orElseThrow(() -> new BadCredentialsException("Invalid email or password."));
 
     if (!passwordEncoder.matches(command.password(), user.getPasswordHash())) {
-      throw new BadCredentialsException("Email ou senha inválidos.");
+      throw new BadCredentialsException("Invalid email or password.");
     }
 
     return new LoginResult(
