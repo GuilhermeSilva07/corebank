@@ -42,4 +42,18 @@ public class GlobalExceptionHandler {
     ErrorResponse errorResponse = new ErrorResponse("Unauthorized", "INVALID_REFRESH_TOKEN", null);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
   }
+
+  @ExceptionHandler(com.corebank.domain.exception.AccountAccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccountAccessDenied(
+      com.corebank.domain.exception.AccountAccessDeniedException ex) {
+    ErrorResponse errorResponse = new ErrorResponse("Forbidden", "ACCESS_DENIED", null);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+  }
+
+  @ExceptionHandler(com.corebank.domain.exception.InvalidPaginationException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidPagination(
+      com.corebank.domain.exception.InvalidPaginationException ex) {
+    ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), "INVALID_PAGINATION", null);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
 }

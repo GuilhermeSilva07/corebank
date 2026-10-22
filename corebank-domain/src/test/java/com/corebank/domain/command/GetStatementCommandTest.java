@@ -3,6 +3,7 @@ package com.corebank.domain.command;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.corebank.domain.exception.InvalidPaginationException;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -18,23 +19,31 @@ class GetStatementCommandTest {
   }
 
   @Test
-  void create_withNegativePage_throwsIllegalArgumentException() {
+  void create_withExactBoundaryPagination_succeeds() {
+    assertThatCode(() -> new GetStatementCommand(accountId, requesterId, 0, 1))
+        .doesNotThrowAnyException();
+    assertThatCode(() -> new GetStatementCommand(accountId, requesterId, 0, 100))
+        .doesNotThrowAnyException();
+  }
+
+  @Test
+  void create_withNegativePage_throwsInvalidPaginationException() {
     assertThatThrownBy(() -> new GetStatementCommand(accountId, requesterId, -1, 20))
-        .isInstanceOf(IllegalArgumentException.class)
+        .isInstanceOf(InvalidPaginationException.class)
         .hasMessage("Page cannot be less than 0");
   }
 
   @Test
-  void create_withSizeLessThanOne_throwsIllegalArgumentException() {
+  void create_withSizeLessThanOne_throwsInvalidPaginationException() {
     assertThatThrownBy(() -> new GetStatementCommand(accountId, requesterId, 0, 0))
-        .isInstanceOf(IllegalArgumentException.class)
+        .isInstanceOf(InvalidPaginationException.class)
         .hasMessage("Page size must be between 1 and 100");
   }
 
   @Test
-  void create_withSizeGreaterThanOneHundred_throwsIllegalArgumentException() {
+  void create_withSizeGreaterThanOneHundred_throwsInvalidPaginationException() {
     assertThatThrownBy(() -> new GetStatementCommand(accountId, requesterId, 0, 101))
-        .isInstanceOf(IllegalArgumentException.class)
+        .isInstanceOf(InvalidPaginationException.class)
         .hasMessage("Page size must be between 1 and 100");
   }
 }
