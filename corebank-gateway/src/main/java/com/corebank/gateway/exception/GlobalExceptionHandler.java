@@ -3,6 +3,7 @@ package com.corebank.gateway.exception;
 import com.corebank.domain.exception.AccountAccessDeniedException;
 import com.corebank.domain.exception.InvalidPaginationException;
 import com.corebank.domain.exception.InvalidRefreshTokenException;
+import com.corebank.domain.exception.UserAlreadyExistsException;
 import com.corebank.gateway.dto.error.ApiFieldError;
 import com.corebank.gateway.dto.error.ErrorResponse;
 import java.util.List;
@@ -37,6 +38,12 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
     ErrorResponse errorResponse = new ErrorResponse("Unauthorized", "INVALID_CREDENTIALS", null);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+  }
+
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+    ErrorResponse errorResponse = new ErrorResponse("Conflict", "USER_ALREADY_EXISTS", null);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
   }
 
   @ExceptionHandler(InvalidRefreshTokenException.class)
