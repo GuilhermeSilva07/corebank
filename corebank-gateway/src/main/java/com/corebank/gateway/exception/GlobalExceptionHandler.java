@@ -1,5 +1,7 @@
 package com.corebank.gateway.exception;
 
+import com.corebank.domain.exception.AccountAccessDeniedException;
+import com.corebank.domain.exception.InvalidPaginationException;
 import com.corebank.domain.exception.InvalidRefreshTokenException;
 import com.corebank.gateway.dto.error.ApiFieldError;
 import com.corebank.gateway.dto.error.ErrorResponse;
@@ -41,5 +43,17 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(InvalidRefreshTokenException ex) {
     ErrorResponse errorResponse = new ErrorResponse("Unauthorized", "INVALID_REFRESH_TOKEN", null);
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+  }
+
+  @ExceptionHandler(AccountAccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccountAccessDenied(AccountAccessDeniedException ex) {
+    ErrorResponse errorResponse = new ErrorResponse("Forbidden", "ACCESS_DENIED", null);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+  }
+
+  @ExceptionHandler(InvalidPaginationException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidPagination(InvalidPaginationException ex) {
+    ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), "INVALID_PAGINATION", null);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 }
