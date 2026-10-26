@@ -17,7 +17,7 @@ public class AccountService {
   private final AccountRepository accountRepository;
 
   public StatementResult getStatement(GetStatementCommand command) {
-    Account account = findOwnedAccount(command.accountId(), command.requesterId());
+    findOwnedAccount(command.accountId(), command.requesterId());
 
     return new StatementResult(List.of(), command.page(), command.size(), 0L, 0);
   }
