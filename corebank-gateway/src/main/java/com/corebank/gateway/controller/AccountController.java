@@ -54,8 +54,7 @@ public class AccountController {
   @GetMapping("/{id}/balance")
   public ResponseEntity<BalanceResponse> getBalance(@PathVariable UUID id, Principal principal) {
     UUID requesterId = UUID.fromString(principal.getName());
-    BigDecimal balance =
-        accountService.getBalance(id, requesterId);
+    BigDecimal balance = accountService.getBalance(id, requesterId);
 
     return ResponseEntity.ok(new BalanceResponse(balance));
   }
