@@ -3,8 +3,10 @@ package com.corebank.gateway.controller;
 import com.corebank.domain.command.GetStatementCommand;
 import com.corebank.domain.result.StatementResult;
 import com.corebank.domain.service.AccountService;
+import com.corebank.gateway.dto.BalanceResponse;
 import com.corebank.gateway.dto.StatementItemResponse;
 import com.corebank.gateway.dto.StatementResponse;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +49,14 @@ public class AccountController {
             result.totalPages());
 
     return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/{id}/balance")
+  public ResponseEntity<BalanceResponse> getBalance(@PathVariable UUID id, Principal principal) {
+    UUID requesterId = UUID.fromString(principal.getName());
+    BigDecimal balance =
+        accountService.getBalance(id, requesterId);
+
+    return ResponseEntity.ok(new BalanceResponse(balance));
   }
 }
