@@ -1,8 +1,11 @@
 package com.corebank.gateway.exception;
 
 import com.corebank.domain.exception.AccountAccessDeniedException;
+import com.corebank.domain.exception.DestinationAccountNotFoundException;
+import com.corebank.domain.exception.InsufficientBalanceException;
 import com.corebank.domain.exception.InvalidPaginationException;
 import com.corebank.domain.exception.InvalidRefreshTokenException;
+import com.corebank.domain.exception.SelfTransferNotAllowedException;
 import com.corebank.domain.exception.UserAlreadyExistsException;
 import com.corebank.gateway.dto.error.ApiFieldError;
 import com.corebank.gateway.dto.error.ErrorResponse;
@@ -56,6 +59,28 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleAccountAccessDenied(AccountAccessDeniedException ex) {
     ErrorResponse errorResponse = new ErrorResponse("Forbidden", "ACCESS_DENIED", null);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+  }
+
+  @ExceptionHandler(DestinationAccountNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleDestinationAccountNotFound(
+      DestinationAccountNotFoundException ex) {
+    ErrorResponse errorResponse =
+        new ErrorResponse(ex.getMessage(), "DESTINATION_ACCOUNT_NOT_FOUND", null);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+  }
+
+  @ExceptionHandler(SelfTransferNotAllowedException.class)
+  public ResponseEntity<ErrorResponse> handleSelfTransferNotAllowed(
+      SelfTransferNotAllowedException ex) {
+    ErrorResponse errorResponse =
+        new ErrorResponse(ex.getMessage(), "SELF_TRANSFER_NOT_ALLOWED", null);
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(errorResponse);
+  }
+
+  @ExceptionHandler(InsufficientBalanceException.class)
+  public ResponseEntity<ErrorResponse> handleInsufficientBalance(InsufficientBalanceException ex) {
+    ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), "INSUFFICIENT_BALANCE", null);
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(errorResponse);
   }
 
   @ExceptionHandler(InvalidPaginationException.class)
