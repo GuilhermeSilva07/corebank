@@ -10,6 +10,7 @@ import com.corebank.domain.entity.User;
 import com.corebank.domain.exception.AccountAccessDeniedException;
 import com.corebank.domain.repository.AccountRepository;
 import com.corebank.domain.result.StatementResult;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -77,5 +78,60 @@ class AccountServiceTest {
     assertThatThrownBy(() -> accountService.getStatement(command))
         .isInstanceOf(AccountAccessDeniedException.class)
         .hasMessage("Access denied. The account does not belong to the authenticated user.");
+  }
+
+  @Test
+  void getBalance_withValidOwner_returnsBalance() {
+    UUID accountId = UUID.randomUUID();
+    UUID requesterId = UUID.randomUUID();
+    BigDecimal expectedBalance = new BigDecimal("123.45");
+
+    User owner = new User();
+    owner.setId(requesterId);
+
+    Account account = new Account();
+    account.setId(accountId);
+    account.setUser(owner);
+    account.setBalance(expectedBalance);
+
+    when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+
+    BigDecimal actualBalance = accountService.getBalance(accountId, requesterId);
+
+    assertThat(actualBalance).isEqualTo(expectedBalance);
+  }
+
+  @Test
+  void getBalance_withDifferentUser_throwsAccountAccessDeniedException() {
+    UUID accountId = UUID.randomUUID();
+    UUID requesterId = UUID.randomUUID();
+    UUID anotherUserId = UUID.randomUUID();
+
+    User anotherUser = new User();
+    anotherUser.setId(anotherUserId);
+
+    Account account = new Account();
+    account.setId(accountId);
+    account.setUser(anotherUser);
+
+    when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+
+    assertThatThrownBy(() -> accountService.getBalance(accountId, requesterId))
+        .isInstanceOf(AccountAccessDeniedException.class)
+        .hasMessageContaining(
+            "Access denied. The account does not belong to the authenticated user.");
+  }
+
+  @Test
+  void getBalance_withNonExistentAccount_throwsAccountAccessDeniedException() {
+    UUID accountId = UUID.randomUUID();
+    UUID requesterId = UUID.randomUUID();
+
+    when(accountRepository.findById(accountId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> accountService.getBalance(accountId, requesterId))
+        .isInstanceOf(AccountAccessDeniedException.class)
+        .hasMessageContaining(
+            "Access denied. The account does not belong to the authenticated user.");
   }
 }

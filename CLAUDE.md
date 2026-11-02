@@ -42,6 +42,21 @@ Java 21 · Spring Boot 4.1.1 · Spring Security 7.x · Spring Data JPA · Postgr
 - Antes de todo commit: `mvn spotless:apply` seguido de `mvn clean verify`.
 - PR sempre contra `develop`, nunca direto em `main`.
 
+## OpenSpec — quando usar
+
+O projeto usa [OpenSpec](https://github.com/Fission-AI/OpenSpec) (`openspec/` + comandos `/opsx:*` no Claude Code) pra registrar o raciocínio de design de uma mudança *antes* de implementá-la. Convive com os artifacts de Arquitetura e Fluxo de Desenvolvimento linkados no topo deste arquivo, não os substitui: aqueles descrevem o sistema como um todo e o roadmap das fases; o OpenSpec documenta uma mudança específica em andamento, numa pasta própria em `openspec/changes/<nome-da-change>/`.
+
+Use quando o card do Trello envolve decisão de design real — novo endpoint, mudança de modelo de dados, novo fluxo entre módulos, qualquer coisa onde valha a pena pensar na abordagem antes de abrir o editor. Não use pra fixes pontuais, testes unitários isolados, ou nits de review — overhead desnecessário pra mudança pequena.
+
+Fluxo:
+1. `/opsx:explore` — pensar em voz alta antes de se comprometer com uma abordagem (opcional; útil quando a solução não é óbvia)
+2. `/opsx:propose "descrição da mudança"` — gera proposta + design + specs delta + tasks em `openspec/changes/<nome>/`
+3. `/opsx:apply` — implementa as tasks da proposta
+4. `/opsx:sync` — atualiza as specs "oficiais" em `openspec/specs/` sem arquivar a change ainda, se precisar refletir o estado atual antes do merge
+5. `/opsx:archive` — arquiva a change depois que o PR correspondente foi revisado e mergeado
+
+Specs geradas pelo OpenSpec não substituem a revisão humana nem o board do Trello (regra 7 continua valendo: nenhuma change vai pra archive sem passar por Code Review) — são um artifact de apoio ao PR, no mesmo espírito deste CLAUDE.md.
+
 ## Como um agente deve se comportar aqui
 
 - **Ao revisar um PR**: comparar contra as 9 regras acima primeiro (a maioria delas veio de violações reais pegas em review neste projeto), depois contra os critérios de aceitação específicos do card do Trello. Rodar o build localmente (`mvn clean verify`) sempre que possível, não confiar só na leitura do diff — já aconteceu de o diff parecer correto e o CI quebrar por falta de env var.

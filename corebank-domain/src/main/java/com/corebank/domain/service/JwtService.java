@@ -1,5 +1,7 @@
 package com.corebank.domain.service;
 
+import com.corebank.domain.exception.InvalidAccessTokenException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -26,5 +28,21 @@ public class JwtService {
         .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
+  }
+
+  public UUID parseUserId(String token) {
+    try {
+      Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+      String subject =
+          Jwts.parserBuilder()
+              .setSigningKey(key)
+              .build()
+              .parseClaimsJws(token)
+              .getBody()
+              .getSubject();
+      return UUID.fromString(subject);
+    } catch (JwtException | IllegalArgumentException e) {
+      throw new InvalidAccessTokenException("Invalid or expired access token");
+    }
   }
 }

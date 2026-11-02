@@ -5,6 +5,7 @@ import com.corebank.domain.entity.Account;
 import com.corebank.domain.exception.AccountAccessDeniedException;
 import com.corebank.domain.repository.AccountRepository;
 import com.corebank.domain.result.StatementResult;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,10 @@ public class AccountService {
     }
 
     return account;
+  }
+
+  public BigDecimal getBalance(UUID accountId, UUID requesterId) {
+    Account account = findOwnedAccount(accountId, requesterId);
+    return account.getBalance();
   }
 }
