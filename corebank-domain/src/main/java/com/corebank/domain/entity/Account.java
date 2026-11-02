@@ -1,5 +1,6 @@
 package com.corebank.domain.entity;
 
+import com.corebank.domain.exception.InsufficientBalanceException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,4 +41,28 @@ public class Account {
 
   @Column(name = "created_at", nullable = false)
   private Instant createdAt;
+
+  /**
+   * Removes {@code amount} from the balance. Leaves the balance untouched and throws when it does
+   * not cover the amount. Callers that move money must hold a row lock on this account.
+   */
+  public void debit(BigDecimal amount) {
+    requirePositive(amount);
+    if (balance.compareTo(amount) < 0) {
+      throw new InsufficientBalanceException(amount.subtract(balance));
+    }
+    balance = balance.subtract(amount);
+  }
+
+  /** Adds {@code amount} to the balance. */
+  public void credit(BigDecimal amount) {
+    requirePositive(amount);
+    balance = balance.add(amount);
+  }
+
+  private static void requirePositive(BigDecimal amount) {
+    if (amount == null || amount.signum() <= 0) {
+      throw new IllegalArgumentException("Amount must be greater than zero");
+    }
+  }
 }
