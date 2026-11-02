@@ -26,7 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * [TRANSFER] Concurrency test card addresses for balance checks, applied to token rotation.
  */
 @SpringBootTest
-class RefreshTokenConcurrencyIT {
+class RefreshTokenConcurrencyTest {
 
   @Autowired private RefreshTokenService refreshTokenService;
 

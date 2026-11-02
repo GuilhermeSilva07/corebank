@@ -4,6 +4,7 @@ import com.corebank.domain.command.RegisterUserCommand;
 import com.corebank.domain.entity.Account;
 import com.corebank.domain.entity.Address;
 import com.corebank.domain.entity.User;
+import com.corebank.domain.exception.UserAlreadyExistsException;
 import com.corebank.domain.repository.AccountRepository;
 import com.corebank.domain.repository.UserRepository;
 import java.math.BigDecimal;
@@ -23,10 +24,10 @@ public class UserRegistrationService {
   @Transactional
   public Account register(RegisterUserCommand command) {
     if (userRepository.existsByCpf(command.cpf())) {
-      throw new IllegalArgumentException("CPF already registered");
+      throw new UserAlreadyExistsException("CPF already registered");
     }
     if (userRepository.existsByEmail(command.email())) {
-      throw new IllegalArgumentException("Email already registered");
+      throw new UserAlreadyExistsException("Email already registered");
     }
 
     Address address = new Address();
