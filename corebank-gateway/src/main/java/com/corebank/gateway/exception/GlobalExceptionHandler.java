@@ -3,6 +3,7 @@ package com.corebank.gateway.exception;
 import com.corebank.domain.exception.AccountAccessDeniedException;
 import com.corebank.domain.exception.DestinationAccountNotFoundException;
 import com.corebank.domain.exception.InsufficientBalanceException;
+import com.corebank.domain.exception.InvalidFilterException;
 import com.corebank.domain.exception.InvalidPaginationException;
 import com.corebank.domain.exception.InvalidRefreshTokenException;
 import com.corebank.domain.exception.SelfTransferNotAllowedException;
@@ -10,6 +11,7 @@ import com.corebank.domain.exception.UserAlreadyExistsException;
 import com.corebank.gateway.dto.error.ApiFieldError;
 import com.corebank.gateway.dto.error.ErrorResponse;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -86,6 +89,25 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(InvalidPaginationException.class)
   public ResponseEntity<ErrorResponse> handleInvalidPagination(InvalidPaginationException ex) {
     ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), "INVALID_PAGINATION", null);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
+  @ExceptionHandler(InvalidFilterException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidFilter(InvalidFilterException ex) {
+    ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), "INVALID_FILTER", null);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
+  private static final Set<String> PAGINATION_PARAMS = Set.of("page", "size");
+
+  /** A query/path parameter that cannot be converted to its type, e.g. {@code type=FOO}. */
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    String code =
+        PAGINATION_PARAMS.contains(ex.getName()) ? "INVALID_PAGINATION" : "INVALID_FILTER";
+    String message = "Invalid value for parameter '" + ex.getName() + "'";
+    ErrorResponse errorResponse =
+        new ErrorResponse(message, code, List.of(new ApiFieldError(ex.getName(), message)));
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 }
